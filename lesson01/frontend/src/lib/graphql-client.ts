@@ -1,5 +1,5 @@
 import { GraphQLClient } from "graphql-request"
 
-const endpoint = "/graphql";
+const endpoint = "http://localhost:3000/graphql";
 
-export const graphQLClient = new GraphQLClient(endpoint, {headers: {}})
+export const graphQLClient = new GraphQLClient(endpoint, {})
