@@ -1,58 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { Kysely } from 'kysely';
+import { Database } from 'src/database/database.types';
 
 @Injectable()
 export class UsersService {
-    private users = [
-        {
-            "id": 1,
-            "role": "INTERN",
-        },
-        {
-            "id": 2,
-            "role": "ADMIN",
-        },
-        {
-            "id": 3,
-            "role": "ENGINEER",
-        },
-    ];
+
+    constructor(@Inject('KYSELY') private readonly db: Kysely<Database>) {}
 
     findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
         if (role) {
-            return this.users.filter(user => user.role === role);
+            return this.db
+                .selectFrom('users')
+                .selectAll()
+                .where('role', '=', role)
+                .execute();
         }
-        return this.users;
+        return this.db
+            .selectFrom('users')
+            .selectAll()
+            .execute();
     }
 
     findOne(id: number) {
-        return this.users.find(user => user.id === id);
+        return this.db
+            .selectFrom('users')
+            .selectAll()
+            .where('id', '=', id)
+            .executeTakeFirstOrThrow();
     }
 
-    create(role: 'INTERN' | 'ENGINEER' | 'ADMIN') {
-        const usersByHightestId = [...this.users].sort((a,b)=> b.id - a.id);
-        const newUser = {
-            id: usersByHightestId[0].id + 1,
-            role: role,
-        };
-        this.users.push(newUser);
-        return newUser;
+    create(name: string, role: 'INTERN' | 'ENGINEER' | 'ADMIN') {
+        return this.db
+            .insertInto('users')
+            .values({
+                name: name,
+                role: role
+            })
+            .returningAll()
+            .executeTakeFirstOrThrow();
     }
 
     update(id: number, role: 'INTERN' | 'ENGINEER' | 'ADMIN' ) {
-        this.users = this.users.map(user => {
-            if (user.id === id) {
-                return { ...user, role: role };
-            }
-            return user;
-        });
-
-        return this.findOne(id);
+        return this.db
+            .updateTable('users')
+            .set({
+                role: role
+            })
+            .where('id', '=', id)
+            .returningAll()
+            .executeTakeFirst();
     }
 
     delete(id: number) {
-        const removedUser = this.findOne(id)
-
-        this.users = this.users.filter(user => user.id !== id);
-        return removedUser;
+        return this.db
+            .deleteFrom('users')
+            .where('id', '=', id)
+            .returningAll()
+            .executeTakeFirst();
     }
 }

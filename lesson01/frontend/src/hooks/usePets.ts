@@ -4,6 +4,7 @@ import request from "graphql-request";
 const petsQuery = `
     {
         pets {
+            id,
             name,
             type
         }
@@ -12,6 +13,15 @@ const petsQuery = `
 const newPetQuery = `
     mutation($name: String!, $type: String) {
         createPet(petInput: {name: $name, type: $type}) {
+            name,
+            type
+        }
+    }
+`;
+
+const deletePetQuery = `
+    mutation($id: String!) {
+        deletePet(id: $id) {
             name,
             type
         }
@@ -37,6 +47,20 @@ export function useNewPet() {
         mutationKey: ['createPet'],
         mutationFn: async (pet: {name: string, type?: string}) => {
             return request('http://localhost:3000/graphql', newPetQuery, pet);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['pets'] });
+        }
+    });
+}
+
+export function useDeletePet() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['deletePet'],
+        mutationFn: async (id: string) => {
+            return request('http://localhost:3000/graphql', deletePetQuery, { id });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['pets'] });
