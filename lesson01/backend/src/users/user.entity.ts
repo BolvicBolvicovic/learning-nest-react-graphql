@@ -11,3 +11,12 @@ export class User {
     @Field({ nullable: true })
     role?: string;
 }
+
+@InputType()
+export class UserInput {
+    @Field()
+    name: string;
+
+    @Field()
+    role: 'INTERN' | 'ADMIN' | 'ENGINEER';
+}

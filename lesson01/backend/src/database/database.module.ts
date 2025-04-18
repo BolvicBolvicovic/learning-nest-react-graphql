@@ -60,6 +60,11 @@ const kyselyProvider = {
                 .addColumn('name', 'varchar', (col) => col.notNull())
                 .addColumn('type', 'varchar')
                 .execute();
+        }
+
+        try {
+            await db.selectFrom('users').select('id').limit(1).execute();
+        } catch (error) {
             await db.schema
                 .createTable('users')
                 .addColumn('id', 'serial', (col) => col.primaryKey())
