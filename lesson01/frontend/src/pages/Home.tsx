@@ -12,11 +12,11 @@ export default function Home() {
           Pet Shop
         </h1>
         <div className="flex flex-raw max-row-2 items-center justify-center min-h-screen w-screen space-x-4">
-          <UsersList />
-        </div>
-        <div className="flex flex-raw max-row-2 items-center justify-center min-h-screen w-screen space-x-4">
           <PetsList />
           <PetsForm />
+        </div>
+        <div className="flex flex-raw max-row-2 items-center justify-center min-h-screen w-screen space-x-4">
+          <UsersList />
         </div>
       </div>
     );
